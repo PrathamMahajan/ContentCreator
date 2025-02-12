@@ -1,6 +1,6 @@
 from news_fetcher import get_news_content
 from summarizer import summarize_text
-from tweet_generator import generate_tweet
+from tweet_generator import generate_tweet, generate_hashtags
 from twitter_api import post_tweet
 
 def main(): 
@@ -22,7 +22,12 @@ def main():
         print(a)
         summary = summarize_text(article)
         print(summary)
-
+        print("-------TWEET-------")
+        tweet = generate_tweet(summary)
+        hashtags = generate_hashtags(summary)
+        
+        print("Generated Tweet:", tweet)
+        print("Generated Hashtags:", " ".join(hashtags))
 
 if __name__ == "__main__":
     main()
