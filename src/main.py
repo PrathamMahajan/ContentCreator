@@ -3,7 +3,7 @@ from summarizer import summarize_text
 from tweet_generator import generate_tweet
 from twitter_api import post_tweet
 
-def main():
+def main(): 
     topic = input("Enter a topic: ")
 
     articles = []
