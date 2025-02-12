@@ -1,13 +1,9 @@
 # Virtual environment
 .env
 
-#env
-src/
 venv
 
-
 # Byte-compiled / cached files
-src/
 __pycache__/
 *.pyc
 *.pyo
