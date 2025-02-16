@@ -1,33 +1,64 @@
+import time
+import psycopg2
 from news_fetcher import get_news_content
 from summarizer import summarize_text
 from tweet_generator import generate_tweet, generate_hashtags
 from twitter_api import post_tweet
 
-def main(): 
-    topic = input("Enter a topic: ")
+def main():
+    topic = input("Enter a topic: ").strip()
 
-    articles = []
-    # Fetch news articles
-    articles = get_news_content(topic)
-    if not articles:
-        print("No news articles found.")
-        return
+    if not topic:
+        print("Error: Topic cannot be empty. Please enter a valid topic.")
+        return []
 
-    a = "*"
-    for i in range(100):
-        a += "*"
+    try:
+        articles = get_news_content(topic)
+        if not articles:
+            print("No news articles found.")
+            return []
+    except Exception as e:
+        print(f"Error fetching news articles: {e}")
+        return []
 
-    # Summarize first article (can be modified to loop through multiple)
+    
+    tweets = []
+
     for article in articles:
-        print(a)
-        summary = summarize_text(article)
-        print(summary)
-        print("-------TWEET-------")
-        tweet = generate_tweet(summary)
-        hashtags = generate_hashtags(summary)
-        
-        print("Generated Tweet:", tweet)
-        print("Generated Hashtags:", " ".join(hashtags))
+        if not article or not isinstance(article, str):
+            print("Skipping invalid or empty article.")
+            continue
+
+        try:
+            summary = summarize_text(article)
+            if not summary or summary.lower().startswith("summarization failed"):
+                print("Error summarizing article.")
+                continue
+        except Exception as e:
+            print(f"Error summarizing article: {e}")
+            continue
+
+        try:
+            tweet = generate_tweet(summary)
+            hashtags = generate_hashtags(summary)
+            
+            if isinstance(hashtags, list):
+                hashtags = " ".join(hashtags)
+
+            final_tweet = tweet + " " + hashtags
+
+            tweets.append(final_tweet)
+        except Exception as e:
+            print(f"Error generating tweet or hashtags: {e}")
+            continue
+
+    return tweets
 
 if __name__ == "__main__":
-    main()
+    tweets = main()
+    separator = "*" * 100
+    for t in tweets:
+        time.sleep(5)  # Prevent Twitter API rate limits
+        print(separator)
+        print(t)
+        # post_tweet(t)
